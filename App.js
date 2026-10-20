@@ -52,6 +52,35 @@ export default function App() {
         thirdPartyCookiesEnabled={true}
         originWhitelist={['*']}
         userAgent="Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.230 Mobile Safari/537.36"
+        injectedJavaScriptBeforeContentLoaded={`
+          const meta = document.createElement('meta');
+          meta.name = 'viewport';
+          meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+          document.head.appendChild(meta);
+          true;
+        `}
+        injectedJavaScript={`
+          function fixLayout() {
+            const style = document.createElement('style');
+            style.innerHTML = \`
+              html, body { overflow-x: hidden !important; max-width: 100vw !important; }
+              * { max-width: 100vw !important; box-sizing: border-box !important; }
+              video { width: 100vw !important; max-width: 100vw !important; height: auto !important; object-fit: cover !important; }
+              .elementor-video-container, .elementor-widget-video, .wp-video-shortcode { width: 100% !important; max-width: 100% !important; }
+            \`;
+            document.head.appendChild(style);
+            document.querySelectorAll('video').forEach(v => {
+              v.style.width = '100vw';
+              v.style.maxWidth = '100vw';
+              v.style.height = 'auto';
+            });
+          }
+          fixLayout();
+          window.addEventListener('load', fixLayout);
+          setTimeout(fixLayout, 1000);
+          setTimeout(fixLayout, 3000);
+          true;
+        `}
       />
     </View>
   );
